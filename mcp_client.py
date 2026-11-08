@@ -9,7 +9,8 @@ from mcp.client.stdio import stdio_client
 class MCPClient:                                         
     def __init__(self):
         self.session = None                              
-        self.exit_stack = AsyncExitStack()              
+        self.exit_stack = AsyncExitStack()   
+        self.history = []           
 
     # ---------- Kết nối (bài 8 + bài 9) ----------
     async def connect(self, server_script: str):
@@ -33,8 +34,10 @@ class MCPClient:
         return result.tools
 
     async def call_tool(self, tool_name: str, arguments: dict):
-        return await self.session.call_tool(tool_name, arguments)
-
+        result = await self.session.call_tool(tool_name, arguments)
+        self.history.append({"operation": "tool", "name": tool_name})  # Add this line
+        return result
+    
     # ---------- Resources ----------
     async def list_resources(self):
         result = await self.session.list_resource_templates()
@@ -53,7 +56,7 @@ class MCPClient:
 
     async def run(self):
         print("\n=== MCP Client ===")
-        print("Commands: tools | call | resources | read | prompts | prompt | quit")
+        print("Commands: tools | call | resources | read | prompts | prompt | history | quit")
 
         while True:
             cmd = input("> ").strip().lower()
@@ -106,6 +109,14 @@ class MCPClient:
                         text = msg.content.text if hasattr(msg.content, "text") else str(msg.content)
                         print(f"{msg.role}: {text}")
 
+                elif cmd == "history":
+                    if self.history:
+                        print("  Operation History:")
+                        for i, entry in enumerate(self.history, 1):
+                            print(f"    {i}. {entry['operation']}: {entry['name']}")
+                    else:
+                        print("  No operations yet")
+                        
                 else:
                     print("  Unknown command")
 
