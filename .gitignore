@@ -4,3 +4,6 @@ __pycache__/
 .env
 .DS_Store
 .vscode/
+
+# File do tool write_file tạo ra
+output/

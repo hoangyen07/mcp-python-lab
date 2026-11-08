@@ -6,6 +6,7 @@ logging.getLogger("fastmcp").setLevel(logging.WARNING)
 
 mcp = FastMCP("lab-server")      # tạo server, đặt tên
 BASE_DIR = Path.cwd()            # thư mục đang đứng khi chạy lệnh
+OUTPUT_DIR = BASE_DIR / "output" # nơi write_file ghi file ra
 
 
 @mcp.tool()
@@ -16,11 +17,13 @@ def echo(text: str) -> str:
 
 @mcp.tool()
 def write_file(path: str, content: str) -> str:
-    """Write content to a file."""
-    file_path = BASE_DIR / path
+    """Write content to a file inside the output directory."""
+    file_path = (OUTPUT_DIR / path).resolve()
+    if not file_path.is_relative_to(OUTPUT_DIR.resolve()):  # chặn "../" thoát ra ngoài output/
+        return f"Error: path must stay inside output/: {path}"
     file_path.parent.mkdir(parents=True, exist_ok=True)   # tạo thư mục cha nếu chưa có
     file_path.write_text(content, encoding="utf-8")
-    return f"Successfully wrote to {path}"
+    return f"Successfully wrote to output/{path}"
 
 
 @mcp.resource("file://resources/{filename}")
