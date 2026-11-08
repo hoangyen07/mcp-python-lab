@@ -68,9 +68,10 @@ class MCPClient:
                     tool_name = input("  Tool name: ").strip()
                     args = json.loads(input('  Arguments (JSON, e.g. {"text": "hello"}): ').strip())
                     result = await self.call_tool(tool_name, args)
+                    label = "Error" if result.isError else "Result"
                     for content in result.content:
                         if hasattr(content, "text"):
-                            print(f"  Result: {content.text}")
+                            print(f"  {label}: {content.text}")
 
                 elif cmd == "resources":
                     resources = await self.list_resources()
