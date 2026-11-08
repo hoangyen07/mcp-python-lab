@@ -31,7 +31,7 @@ def read_resource_file(filename: str) -> str:
     """Read a file from the resources directory."""
     file_path = BASE_DIR / "resources" / filename
     if not file_path.exists():
-        return f"File not found: {filename}"
+        raise FileNotFoundError(f"File not found: {filename}")
     return file_path.read_text(encoding="utf-8")
 
 
